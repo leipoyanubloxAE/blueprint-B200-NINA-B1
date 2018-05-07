@@ -39,6 +39,12 @@ ifeq (MinGW, $(findstring MinGW, $(UNAME)))
 	NRF_UTIL = tools/nordic/nrfutil.exe
 endif
 
+ifeq (CYGWIN, $(findstring CYGWIN, $(UNAME)))
+	# Variables specific for building in MinGW (Eclipse)
+	SREC_CAT = tools/srec_cat.exe
+	NRF_UTIL = tools/nordic/nrfutil.exe
+endif
+
 ifeq (Linux, $(findstring Linux, $(UNAME)))
 	# Variables specific for building on the gitlab CI machine
 	SREC_CAT = srec_cat

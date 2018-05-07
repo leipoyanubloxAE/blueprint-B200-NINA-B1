@@ -75,6 +75,7 @@ INC_PATHS += -I$(SDK_ROOT)/components/drivers_nrf/config
 INC_PATHS += -I$(SDK_ROOT)/components/drivers_nrf/delay
 INC_PATHS += -I$(SDK_ROOT)/components/drivers_nrf/hal
 INC_PATHS += -I$(SDK_ROOT)/components/drivers_nrf/pstorage
+INC_PATHS += -I$(SDK_ROOT)/components/drivers_nrf/pstorage/config
 INC_PATHS += -I$(SDK_ROOT)/components/libraries/bootloader_dfu
 INC_PATHS += -I$(SDK_ROOT)/components/libraries/bootloader_dfu/ble_transport
 INC_PATHS += -I$(SDK_ROOT)/components/libraries/crc16
@@ -87,6 +88,8 @@ INC_PATHS += -I$(SDK_ROOT)/components/softdevice/s132/headers
 INC_PATHS += -I$(SDK_ROOT)/components/softdevice/s132/headers/nrf52
 INC_PATHS += -I$(SDK_ROOT)/components/toolchain
 INC_PATHS += -I$(SDK_ROOT)/components/toolchain/CMSIS/Include
+INC_PATHS += -I$(SDK_ROOT)/examples/bsp
+INC_PATHS += -I../src
 INC_PATHS += -I$(abspath ../src)
 INC_PATHS += -I$(abspath .)
 

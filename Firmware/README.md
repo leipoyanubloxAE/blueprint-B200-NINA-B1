@@ -9,7 +9,9 @@ Precompiled firmware is provided and can be used with B200 hardware. The .hex fi
 * Clone this repository  
 ```> git clone https://github.com/u-blox/blueprint-B200-NINA-B1```
 
-* Download the source code for nrf5 sdk version 11.0.0 from [Nordic](https://www.nordicsemi.com)
+* Download the source code for nrf5 sdk version 11.0.0 from [Nordic](https://www.nordicsemi.com). Copy Firmware/src/nina_b1.h to nRF5_SDK_11.0.0/examples/bsp. Modify boards.h to include the header file nina_b1.h
+```#elif defined(BOARD_NINA_B1)```
+```#include "nina_b1.h"```
 
 * Update the SDK\_ROOT variable in the Makefiles (for the main project and the bootloader) according to your installation of the nrf5 SDK  
 ```For example: SDK_ROOT := C:/nRF5_SDK_11.0.0```  

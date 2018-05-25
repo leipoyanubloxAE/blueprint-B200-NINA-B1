@@ -68,7 +68,7 @@
 #define CENTRAL_LINK_COUNT               0                                          /**<number of central links used by the application. When changing this number remember to adjust the RAM settings*/
 #define PERIPHERAL_LINK_COUNT            1                                          /**<number of peripheral links used by the application. When changing this number remember to adjust the RAM settings*/
 
-#define APP_ADV_INTERVAL                 300                                        /**< The advertising interval (in units of 0.625 ms. */
+#define APP_ADV_INTERVAL                 300                                        /**< The advertising interval (in units of 0.625 ms. This value corresponds to 25 ms). */
 #define APP_ADV_TIMEOUT_IN_SECONDS       60                                         /**< The advertising timeout in units of seconds. */
 
 #define APP_TIMER_PRESCALER              0                                          /**< Value of the RTC1 PRESCALER register. */
@@ -151,6 +151,8 @@ static led_service_init_t   led_init;
 static temp_service_init_t  temp_init;
 
 static char m_device_name[16];
+
+static uint8_t B200_hw = 1;
 
 /*****************************************************************************
  * Private method definitions
@@ -302,7 +304,8 @@ static void battery_level_meas_timeout_handler(void * p_context)
     }
 
     /* Sample Temperature as well */
-    sensor_get_temperature();
+    if (B200_hw)
+        sensor_get_temperature();
 }
 
 /**@brief Function for the Timer initialization.
@@ -402,21 +405,24 @@ static void services_init(void)
 {
     uint32_t       err_code;
 
-    // Initialize Battery Service.
-    memset(&bas_init, 0, sizeof(bas_init));
-    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&bas_init.battery_level_char_attr_md.cccd_write_perm);
-    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&bas_init.battery_level_char_attr_md.read_perm);
-    BLE_GAP_CONN_SEC_MODE_SET_NO_ACCESS(&bas_init.battery_level_char_attr_md.write_perm);
-    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&bas_init.battery_level_report_read_perm);
-
-    bas_init.evt_handler          = NULL;
-    bas_init.support_notification = true;
-    bas_init.p_report_ref         = NULL;
-    bas_init.initial_batt_level   = battery_get_last_estimate();
-
-    err_code = ble_bas_init(&m_bas, &bas_init);
-    APP_ERROR_CHECK(err_code);
-
+    if(B200_hw)
+    {
+        // Initialize Battery Service.
+        memset(&bas_init, 0, sizeof(bas_init));
+        BLE_GAP_CONN_SEC_MODE_SET_OPEN(&bas_init.battery_level_char_attr_md.cccd_write_perm);
+        BLE_GAP_CONN_SEC_MODE_SET_OPEN(&bas_init.battery_level_char_attr_md.read_perm);
+        BLE_GAP_CONN_SEC_MODE_SET_NO_ACCESS(&bas_init.battery_level_char_attr_md.write_perm);
+        BLE_GAP_CONN_SEC_MODE_SET_OPEN(&bas_init.battery_level_report_read_perm);
+    
+        bas_init.evt_handler          = NULL;
+        bas_init.support_notification = true;
+        bas_init.p_report_ref         = NULL;
+        bas_init.initial_batt_level   = battery_get_last_estimate();
+    
+        err_code = ble_bas_init(&m_bas, &bas_init);
+        APP_ERROR_CHECK(err_code);
+    }
+    
     // Initialize Device Information Service.
     memset(&dis_init, 0, sizeof(dis_init));
     set_dev_info(&dis_init);
@@ -425,28 +431,31 @@ static void services_init(void)
     err_code = ble_dis_init(&dis_init);
     APP_ERROR_CHECK(err_code);
 
-    // Initialize Accelerometer service
-    memset(&acc_init, 0, sizeof(acc_init));
-    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&acc_init.char_attr_md.cccd_write_perm);
-    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&acc_init.char_attr_md.read_perm);
-    BLE_GAP_CONN_SEC_MODE_SET_NO_ACCESS(&acc_init.char_attr_md.write_perm);
-    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&acc_init.report_read_perm);
-
-    acc_init.initial_range        = sensor_get_acc_range();
-
-    err_code = acc_srv_init(&m_acc, &acc_init);
-    APP_ERROR_CHECK(err_code);
-
-    // Initialize Gyro service
-    memset(&gyro_init, 0, sizeof(gyro_init));
-    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&gyro_init.char_attr_md.cccd_write_perm);
-    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&gyro_init.char_attr_md.read_perm);
-    BLE_GAP_CONN_SEC_MODE_SET_NO_ACCESS(&gyro_init.char_attr_md.write_perm);
-    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&gyro_init.report_read_perm);
-
-    err_code = gyro_srv_init(&m_gyro, &gyro_init);
-    APP_ERROR_CHECK(err_code);
-
+    if(B200_hw)
+    {
+        // Initialize Accelerometer service
+        memset(&acc_init, 0, sizeof(acc_init));
+        BLE_GAP_CONN_SEC_MODE_SET_OPEN(&acc_init.char_attr_md.cccd_write_perm);
+        BLE_GAP_CONN_SEC_MODE_SET_OPEN(&acc_init.char_attr_md.read_perm);
+        BLE_GAP_CONN_SEC_MODE_SET_NO_ACCESS(&acc_init.char_attr_md.write_perm);
+        BLE_GAP_CONN_SEC_MODE_SET_OPEN(&acc_init.report_read_perm);
+    
+        acc_init.initial_range        = sensor_get_acc_range();
+    
+        err_code = acc_srv_init(&m_acc, &acc_init);
+        APP_ERROR_CHECK(err_code);
+    
+        // Initialize Gyro service
+        memset(&gyro_init, 0, sizeof(gyro_init));
+        BLE_GAP_CONN_SEC_MODE_SET_OPEN(&gyro_init.char_attr_md.cccd_write_perm);
+        BLE_GAP_CONN_SEC_MODE_SET_OPEN(&gyro_init.char_attr_md.read_perm);
+        BLE_GAP_CONN_SEC_MODE_SET_NO_ACCESS(&gyro_init.char_attr_md.write_perm);
+        BLE_GAP_CONN_SEC_MODE_SET_OPEN(&gyro_init.report_read_perm);
+    
+        err_code = gyro_srv_init(&m_gyro, &gyro_init);
+        APP_ERROR_CHECK(err_code);
+    }
+    
     // Initialize LED service
     memset(&led_init, 0, sizeof(led_init));
     BLE_GAP_CONN_SEC_MODE_SET_OPEN(&led_init.char_attr_md.cccd_write_perm);
@@ -461,18 +470,21 @@ static void services_init(void)
     err_code = led_srv_init(&m_led, &led_init);
     APP_ERROR_CHECK(err_code);
 
-    // Initialize Temperature service
-    memset(&temp_init, 0, sizeof(temp_init));
-    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&temp_init.char_attr_md.cccd_write_perm);
-    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&temp_init.char_attr_md.read_perm);
-    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&temp_init.char_attr_md.write_perm);
-    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&temp_init.report_read_perm);
-
-    temp_init.temp_init_val = 0;
-
-    err_code = temp_srv_init(&m_temp, &temp_init);
-    APP_ERROR_CHECK(err_code);
-
+    if(B200_hw)
+    {
+        // Initialize Temperature service
+        memset(&temp_init, 0, sizeof(temp_init));
+        BLE_GAP_CONN_SEC_MODE_SET_OPEN(&temp_init.char_attr_md.cccd_write_perm);
+        BLE_GAP_CONN_SEC_MODE_SET_OPEN(&temp_init.char_attr_md.read_perm);
+        BLE_GAP_CONN_SEC_MODE_SET_OPEN(&temp_init.char_attr_md.write_perm);
+        BLE_GAP_CONN_SEC_MODE_SET_OPEN(&temp_init.report_read_perm);
+    
+        temp_init.temp_init_val = 0;
+    
+        err_code = temp_srv_init(&m_temp, &temp_init);
+        APP_ERROR_CHECK(err_code);
+    }
+        
     /** @snippet [DFU BLE Service initialization] */
     ble_dfu_init_t   dfus_init;
 
@@ -555,7 +567,8 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
     switch (ble_adv_evt)
     {
         case BLE_ADV_EVT_IDLE:
-            sensor_enable_motion_detect();
+            if(B200_hw)
+                sensor_enable_motion_detect();
             nrf_delay_ms(2);
 
             /**
@@ -850,17 +863,19 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
             {
         case BLE_GAP_EVT_CONNECTED:
             m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
-
-            sensors_set_normal_mode();
+            if(B200_hw)
+            {
+                sensors_set_normal_mode();
+                sensor_get_temperature();
+                set_sensor_init_vals();
+            }
             leds_blink_stop();
-            sensor_get_temperature();
-
-            set_sensor_init_vals();
             break;
 
         case BLE_GAP_EVT_DISCONNECTED:
             m_conn_handle = BLE_CONN_HANDLE_INVALID;
-            sensor_enable_motion_detect();
+            if(B200_hw)
+                sensor_enable_motion_detect();
             nrf_delay_ms(2);
 
             /**
@@ -886,13 +901,18 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 {
     dm_ble_evt_handler(p_ble_evt);
-    ble_bas_on_ble_evt(&m_bas, p_ble_evt);
+    if(B200_hw)
+        ble_bas_on_ble_evt(&m_bas, p_ble_evt);
     ble_conn_params_on_ble_evt(p_ble_evt);
     ble_advertising_on_ble_evt(p_ble_evt);
-    acc_srv_on_ble_evt(&m_acc, p_ble_evt);
-    gyro_srv_on_ble_evt(&m_gyro, p_ble_evt);
+    if(B200_hw)
+    {
+        acc_srv_on_ble_evt(&m_acc, p_ble_evt);
+        gyro_srv_on_ble_evt(&m_gyro, p_ble_evt);
+    }
     led_srv_on_ble_evt(&m_led, p_ble_evt);
-    temp_srv_on_ble_evt(&m_temp, p_ble_evt);
+    if(B200_hw)
+        temp_srv_on_ble_evt(&m_temp, p_ble_evt);
     /** @snippet [Propagating BLE Stack events to DFU Service] */
     ble_dfu_on_ble_evt(&m_dfus, p_ble_evt);
     /** @snippet [Propagating BLE Stack events to DFU Service] */
@@ -972,7 +992,7 @@ int main(void)
     leds_init();
     app_trace_init();
     timers_init();
-    sensor_init(sensor_event_handler_cb);
+    B200_hw = sensor_init(sensor_event_handler_cb);
     battery_init();
 
     ble_stack_init();

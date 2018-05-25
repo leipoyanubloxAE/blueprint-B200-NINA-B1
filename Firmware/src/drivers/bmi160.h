@@ -100,8 +100,10 @@ typedef void (*sensor_event_handler_cb_t)(sensor_event_t evt);
 /**@brief Initialize the bmi160 chip
  *
  * @param[in]   handler				event handler
+ *
+ * @return      1 if communication with sensor ok, otherwise 0
  */
-void sensor_init(sensor_event_handler_cb_t handler);
+uint8_t sensor_init(sensor_event_handler_cb_t handler);
 
 /**@brief Read chip ID
  *

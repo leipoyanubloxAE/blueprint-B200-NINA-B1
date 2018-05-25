@@ -322,14 +322,18 @@ static uint8_t read_error()
     return m_data_buffer[0];
 }
 
-static void chip_reset()
+static uint32_t chip_reset()
 {
+    uint32_t err_code;
+    
     static app_twi_transfer_t const transfers[] = {
             APP_TWI_WRITE(BMI160_ADDRESS, CMD_SOFT_RESET, sizeof(CMD_SOFT_RESET), 0)
     };
 
-    APP_ERROR_CHECK(app_twi_perform(&m_app_twi, transfers,
-            sizeof(transfers) / sizeof(transfers[0]), NULL));
+    err_code = app_twi_perform(&m_app_twi, transfers,
+            sizeof(transfers) / sizeof(transfers[0]), NULL);
+            
+    return err_code;
 }
 
 uint8_t read_reg(uint8_t reg)
@@ -354,17 +358,23 @@ uint8_t read_reg(uint8_t reg)
 /// @name Public Methods
 //@{
 
-void sensor_init(sensor_event_handler_cb_t handler)
+uint8_t sensor_init(sensor_event_handler_cb_t handler)
 {
     uint8_t chip_id;
     uint8_t err_code;
-
+    uint32_t sensor_err;
+    
     m_handler = handler;
 
     twi_init();
 
     /* Start with a chip reset to make sure we have a known state */
-    chip_reset();
+    sensor_err = chip_reset();
+    if (sensor_err != NRF_SUCCESS)
+    {
+        /* HW is not a B200 (or sensor/i2c communication error) */
+        return 0;
+    }
 
     /* Verify Chip ID */
     chip_id = sensor_read_chip_id();
@@ -377,6 +387,8 @@ void sensor_init(sensor_event_handler_cb_t handler)
     /* Check for errors */
     err_code = read_error();
     APP_ERROR_CHECK_BOOL(err_code == 0);
+    
+    return 1;
 }
 
 void sensors_set_normal_mode(void)

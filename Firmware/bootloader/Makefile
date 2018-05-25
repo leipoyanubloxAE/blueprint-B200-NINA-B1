@@ -68,6 +68,7 @@ ASM_SOURCE_FILES  = $(SDK_ROOT)/components/toolchain/gcc/gcc_startup_nrf52.s
 
 #includes common to all targets
 INC_PATHS  = -I$(abspath config/dfu_dual_bank_ble_s132_pca10040)
+INC_PATHS  = -I$(abspath config)
 INC_PATHS += -I$(SDK_ROOT)/components/ble/ble_services/ble_dfu
 INC_PATHS += -I$(SDK_ROOT)/components/ble/common
 INC_PATHS += -I$(SDK_ROOT)/components/device

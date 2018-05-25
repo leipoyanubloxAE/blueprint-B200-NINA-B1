@@ -1,7 +1,7 @@
 MAKEFILE_NAME := $(MAKEFILE_LIST)
 MAKEFILE_DIR := $(dir $(MAKEFILE_NAME) ) 
 
-SDK_ROOT := C:/sw/nRF5_SDK_11.0.0
+SDK_ROOT := C:/work/projects/coding/Nordic/nRF5_SDK_11.0.0_89a8197
 PROJ_DIR := src
 TEMPLATE_PATH := $(SDK_ROOT)/components/toolchain/gcc
 
@@ -40,6 +40,12 @@ ifeq (MinGW, $(findstring MinGW, $(UNAME)))
 endif
 
 ifeq (CYGWIN, $(findstring CYGWIN, $(UNAME)))
+	# Variables specific for building in MinGW (Eclipse)
+	SREC_CAT = tools/srec_cat.exe
+	NRF_UTIL = tools/nordic/nrfutil.exe
+endif
+
+ifeq (MINGW, $(findstring MINGW, $(UNAME)))
 	# Variables specific for building in MinGW (Eclipse)
 	SREC_CAT = tools/srec_cat.exe
 	NRF_UTIL = tools/nordic/nrfutil.exe

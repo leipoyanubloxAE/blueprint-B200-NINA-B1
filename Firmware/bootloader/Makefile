@@ -5,7 +5,7 @@ export OUTPUT_FILENAME
 MAKEFILE_NAME := $(MAKEFILE_LIST)
 MAKEFILE_DIR := $(dir $(MAKEFILE_NAME) ) 
 
-SDK_ROOT := C:/sw/nRF5_SDK_11.0.0
+SDK_ROOT := C:/work/projects/coding/Nordic/nRF5_SDK_11.0.0_89a8197
 TEMPLATE_PATH := $(SDK_ROOT)/components/toolchain/gcc
 
 GNU_PREFIX := arm-none-eabi

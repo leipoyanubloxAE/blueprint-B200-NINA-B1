@@ -2,7 +2,7 @@
  * Copyright (C) u-blox 
  * 
  * u-blox reserves all rights in this deliverable (documentation, software, etc.,
- * hereafter “Deliverable”). 
+ * hereafter “Deliverable”).
  * 
  * u-blox grants you the right to use, copy, modify and distribute the
  * Deliverable provided hereunder for any purpose without fee.
@@ -575,7 +575,8 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
              * Enter System Off power mode, the nRF will reset at motion event
              * from accelerometer.
              */
-            APP_ERROR_CHECK(sd_power_system_off());
+            if(B200_hw)
+                APP_ERROR_CHECK(sd_power_system_off());
             break;
         default:
             break;
@@ -882,7 +883,8 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
              * Enter System Off power mode, the nRF will reset at motion event
              * from accelerometer.
              */
-            APP_ERROR_CHECK(sd_power_system_off());
+            if(B200_hw)
+                APP_ERROR_CHECK(sd_power_system_off());
             break;
 
         default:
